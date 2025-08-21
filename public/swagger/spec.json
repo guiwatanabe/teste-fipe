@@ -1,0 +1,177 @@
+openapi: 3.0.4
+info:
+  title: API de Marcas e Modelos - FIPE
+  version: 1.0.0
+  description: API para gerenciar marcas e modelos de veículos, com endpoints autenticados via Token.
+
+servers:
+  - url: http://localhost/api
+    description: Servidor local
+
+components:
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: "Bearer"
+
+  schemas:
+    Brand:
+      type: object
+      properties:
+        codigo:
+          type: integer
+          description: Código único da marca
+          example: 123
+        nome:
+          type: string
+          description: Nome da marca
+          example: "Toyota"
+        idTipoVeiculo:
+          type: integer
+          description: ID do tipo de veículo (1 = carro, 2 = moto, 3 = caminhão)
+          example: 1
+        tipoVeiculo:
+          type: string
+          description: Nome legível do tipo de veículo
+          example: "carros"
+      required:
+        - codigo
+        - nome
+        - idTipoVeiculo
+        - tipoVeiculo
+
+    Model:
+      type: object
+      properties:
+        codigo:
+          type: string
+          description: Código do modelo
+          example: "COROLLA"
+        nome:
+          type: string
+          description: Nome do modelo
+          example: "Corolla XEi"
+        observacoes:
+          type: string
+          description: Observações adicionais do modelo
+          example: "..."
+        marca:
+          $ref: '#/components/schemas/Brand'
+      required:
+        - codigo
+        - nome
+        - marca
+
+security:
+  - sanctumAuth: []
+
+paths:
+  /buscar:
+    get:
+      summary: Inicializar busca de dados
+      description: Inicia a carga inicial ou busca de dados.
+      responses:
+        '200':
+          description: Sucesso
+      security:
+        - sanctumAuth: []
+
+  /marcas:
+    get:
+      summary: Listar todas as marcas
+      responses:
+        '200':
+          description: Lista de marcas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Brand'
+      security:
+        - sanctumAuth: []
+
+  /marcas/{codigo}:
+    get:
+      summary: Obter detalhes de uma marca
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalhes da marca
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '404':
+          description: Marca não encontrada
+      security:
+        - sanctumAuth: []
+
+  /marcas/{codigo}/modelos:
+    get:
+      summary: Listar modelos de uma marca
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de modelos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Model'
+        '404':
+          description: Marca não encontrada
+      security:
+        - sanctumAuth: []
+
+  /marcas/{codigo}/modelos/{codigoModelo}:
+    post:
+      summary: Atualizar modelo de uma marca
+      parameters:
+        - name: codigo
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: codigoModelo
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Dados do modelo a serem atualizados
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+                  example: "Novo Nome do Modelo"
+                observacoes:
+                  type: string
+                  example: "Observações adicionais"
+      responses:
+        '200':
+          description: Modelo atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Model'
+        '404':
+          description: Marca ou modelo não encontrado
+      security:
+        - bearerToken: []
