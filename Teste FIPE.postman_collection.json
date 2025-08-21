@@ -1,0 +1,331 @@
+{
+	"info": {
+		"_postman_id": "4f83f469-d0ec-4689-bd2b-d58cb17e5291",
+		"name": "Teste FIPE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21025716"
+	},
+	"item": [
+		{
+			"name": "Autenticação",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Body matches string\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"token\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"let response = pm.response.json()\r",
+							"let token = response.token\r",
+							"pm.collectionVariables.set(\"TOKEN\", token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"api-user@test.com\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}auth",
+					"host": [
+						"{{baseUrl}}auth"
+					]
+				},
+				"description": "Autenticar e gerar um token de acesso para utilizar nas chamadas subsequentes."
+			},
+			"response": []
+		},
+		{
+			"name": "Carga Inicial",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}buscar",
+					"host": [
+						"{{baseUrl}}buscar"
+					]
+				},
+				"description": "Gerar a carga inicial, buscar todas as marcas e salvar no banco de dados."
+			},
+			"response": []
+		},
+		{
+			"name": "Marcas",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}marcas/",
+					"host": [
+						"{{baseUrl}}marcas"
+					],
+					"path": [
+						""
+					],
+					"query": [
+						{
+							"key": "nome",
+							"value": "honda",
+							"disabled": true
+						},
+						{
+							"key": "tipoVeiculo",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "codigo",
+							"value": "25",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Listar todas as marcas.\n\nCapaz de filtrar pelo tipo do veículo, código ou nome."
+			},
+			"response": []
+		},
+		{
+			"name": "Marca pelo Código",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}marcas/25",
+					"host": [
+						"{{baseUrl}}marcas"
+					],
+					"path": [
+						"25"
+					]
+				},
+				"description": "Buscar marcas pelo código da marca."
+			},
+			"response": []
+		},
+		{
+			"name": "Modelos pela Marca",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseUrl}}marcas/25/modelos",
+					"host": [
+						"{{baseUrl}}marcas"
+					],
+					"path": [
+						"25",
+						"modelos"
+					],
+					"query": [
+						{
+							"key": "codigo",
+							"value": "1241",
+							"disabled": true
+						},
+						{
+							"key": "tipoVeiculo",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "nome",
+							"value": "Accord",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Busca os modelos disponíveis para uma marca.\n\nTambém é capaz de filtrar por código, tipo do veículo, e nome."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Model Data",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nome\": \"Accord Coupe EX\",\r\n    \"observacoes\": \"asdf\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}marcas/25/modelos/1241",
+					"host": [
+						"{{baseUrl}}marcas"
+					],
+					"path": [
+						"25",
+						"modelos",
+						"1241"
+					]
+				},
+				"description": "Atualizar nome e/ou observações de um modelo."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost/api/",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "username",
+			"value": "api-user@test.com",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "password",
+			"value": "password",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		},
+		{
+			"key": "TOKEN",
+			"value": "",
+			"description": {
+				"content": "",
+				"type": "text/plain"
+			}
+		}
+	]
+}
