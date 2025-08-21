@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\ModelController;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,12 @@ Route::controller(BrandController::class)->middleware('auth:sanctum')->group(fun
     Route::get('/marcas', 'brands');
     Route::get('/marcas/{idMarca}', 'brand')->whereNumber('idMarca');
 
+    Route::get('/marcas/{idMarca}/modelos', 'models')->whereNumber('idMarca');
+
+    Route::post('/marcas/{idMarca}/modelos/{idModelo}', 'updateModel')->whereNumber('idMarca')->whereNumber('idModelo');
+});
+
+Route::controller(ModelController::class)->middleware('auth:sanctum')->group(function () {
     Route::get('/marcas/{idMarca}/modelos', 'models')->whereNumber('idMarca');
 
     Route::post('/marcas/{idMarca}/modelos/{idModelo}', 'updateModel')->whereNumber('idMarca')->whereNumber('idModelo');
