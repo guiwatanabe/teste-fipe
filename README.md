@@ -27,7 +27,7 @@
 
 ### Pest
  
- ```composer run pest```
+ ```composer run test```
 
 ### PHPStan
  
